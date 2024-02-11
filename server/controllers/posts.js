@@ -15,6 +15,19 @@ export const getPosts = async (req, res) => {
   }
 };
 
+export const getUserPosts = async (req, res) => {
+  const { username } = req.params;
+
+  try {
+    const searchMessages = await PostMessage.find({ user: username });
+    console.log(searchMessages);
+    res.status(200).json(searchMessages);
+  } catch (error) {
+    console.log(error);
+    res.status(404).json({ message: error.message });
+  }
+};
+
 export const searchPosts = async (req, res) => {
   const hashtag = req.query.hashtag;
 
@@ -44,15 +57,15 @@ export const getPostLikes = async (req, res) => {
 
 export const likePost = async (req, res) => {
   const { id } = req.params;
-
+  const { username } = req.body;
   // if (!req.userId) return res.json({ message: "Unauthenticated" });
 
   if (!mongoose.Types.ObjectId.isValid(id))
-    return res.status(404).json({message: "No post with that ID"});
+    return res.status(404).json({ message: "No post with that ID" });
 
   const post = await PostMessage.findById(id);
   console.log(post);
-  post.likes.push('doctorwellness');
+  post.likes.push(username);
   // const user = await UserModel.findById(id);
 
   // const index = post.likes.find((eachUser) => eachUser === user.username);
@@ -73,6 +86,11 @@ export const likePost = async (req, res) => {
 export const createPosts = async (req, res) => {
   const post = req.body;
   console.log(post);
+
+  if (!post.image || !post.content) {
+    return res.status(400).json({ message: "Please upload all details" });
+  }
+
   const newPost = new PostMessage(post);
   try {
     await newPost.save();
@@ -91,10 +109,13 @@ export const editPost = async (req, res) => {
   }
 
   try {
-    const editedPost = await PostMessage.findByIdAndUpdate(id, { "content": content }, { new: true });
+    const editedPost = await PostMessage.findByIdAndUpdate(
+      id,
+      { content: content },
+      { new: true }
+    );
 
     res.status(200).json(editedPost);
-    
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Internal server error" });

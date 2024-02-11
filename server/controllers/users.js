@@ -3,9 +3,10 @@ import PostMessage from "../models/postModel.js";
 
 export const getUser = async (req, res) => {
     const { username } = req.params;
+    console.log(username);
     
     try {
-        const user = await UserModel.find({"username": username});
+        const user = await UserModel.find({ username: username });
         return res.status(200).json(user);
     } catch(error) {
         return res.status(404).json({message: error.message});

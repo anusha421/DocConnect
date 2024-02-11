@@ -4,7 +4,7 @@ import { getUser, getUserPosts, editUserProfile, deleteUserProfile } from '../co
 
 const router = express.Router();
 
-router.get('/getUserDetails', getUser);
+router.get('/:username', getUser);
 router.get('/posts', getUserPosts);
 router.patch('/edit', editUserProfile);
 router.delete('/delete', deleteUserProfile);
