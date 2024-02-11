@@ -1,6 +1,5 @@
-import React, { useRef } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { styled } from "@mui/material/styles";
 import "../../App.css";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import {
@@ -13,24 +12,86 @@ import {
   Backdrop,
   Button,
   Input,
+  Dialog,
+  DialogTitle,
+  DialogActions,
 } from "@mui/material";
 import Navbar from "../Navbar";
+import Cookies from "universal-cookie";
+import axios from "axios";
 
-const EditProile = () => {
+const cookies = new Cookies();
+
+const EditProfile = () => {
   const navigate = useNavigate();
-  const captionRef = useRef("");
-  const [open, setOpen] = React.useState(true);
+  const [open, setOpen] = useState(true);
+  const [openDialog, setOpenDialog] = useState(false);
+  const createUrl = "http://localhost:3000/posts/create";
+  const [data, setData] = useState({
+    user: cookies.get("username"),
+    content: "",
+    imageUrl: "",
+    likes: [],
+  });
 
   const handleClose = () => {
     setOpen(false);
     navigate(-1);
   };
 
-  function submitHandler(e) {
-    e.preventDefault();
-    captionRef.current.focus;
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
+  };
 
-  }
+  const handleChange = (event) => {
+    const { name, value } = event.target;
+    setData({ ...data, [name]: value });
+  };
+
+  const uploadImage = async () => {
+    try {
+      // Fetching the image as a Blob
+      const file = data.imageUrl;
+      console.log(file)
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("upload_preset", "a0sdlzbk");
+
+      const uploadResponse = await fetch(
+        `https://api.cloudinary.com/v1_1/dt2pgp0mb/image/upload`,
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
+
+      const img = await uploadResponse.json();
+      setData({ ...data, imageUrl: img.secure_url });
+    } catch (error) {
+      console.error("Error uploading image:", error);
+    }
+  };
+
+  const submitHandler = async (e) => {
+    e.preventDefault();
+
+    if (data.content == "" || data.imageUrl == "") {
+      setOpenDialog(true);
+      return;
+    }
+
+    await uploadImage();
+
+    axios
+      .post(createUrl, data)
+      .then((response) => {
+        console.log(response);
+        navigate(-1);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
 
   return (
     <Container
@@ -85,12 +146,13 @@ const EditProile = () => {
           <Grid container spacing={1}>
             <Grid item xs={12}>
               <TextField
-                ref={captionRef}
                 placeholder="Caption"
-                name="caption"
-                required
                 fullWidth
-                id="caption"
+                required
+                name="content"
+                id="content"
+                value={data.content}
+                onChange={handleChange}
                 autoFocus
                 sx={{
                   input: { color: "white" },
@@ -100,17 +162,22 @@ const EditProile = () => {
             </Grid>
             <Grid item xs={12}>
               <Input
+                fullWidth
                 sx={{
-                  display: "none",
+                  input: { color: "white" },
+                  border: "1px solid#fff",
+                  padding: "0.5rem",
                 }}
-                name="image"
+                name="imageUrl"
+                id="image"
                 type="file"
+                value={data.imageUrl}
+                onChange={handleChange}
                 inputProps={{ accept: "image/*" }}
                 required
-                id="image"
                 autoFocus
               />
-              <label htmlFor="image">
+              {/* <label htmlFor="image">
                 <Button
                   fullWidth
                   component="span"
@@ -122,21 +189,35 @@ const EditProile = () => {
                 >
                   Upload Photo
                 </Button>
-              </label>
+              </label> */}
             </Grid>
           </Grid>
 
           <Button
             fullWidth
+            type="submit"
             variant="contained"
             sx={{ mt: 3, mb: 2 }}
           >
             Create Post
           </Button>
+          <Dialog
+            open={openDialog}
+            onClose={handleCloseDialog}
+            aria-labelledby="alert-dialog-title"
+            aria-describedby="alert-dialog-description"
+          >
+            <DialogTitle id="alert-dialog-title">
+              Please enter all details.
+            </DialogTitle>
+            <DialogActions>
+              <Button onClick={handleCloseDialog}>OK</Button>
+            </DialogActions>
+          </Dialog>
         </Box>
       </Modal>
     </Container>
   );
 };
 
-export default EditProile;
+export default EditProfile;

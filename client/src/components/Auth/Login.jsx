@@ -55,6 +55,7 @@ function Login({ setIsLogin }) {
     }
 
     cookies.set("jwt", res.data.token);
+    cookies.set("username", res.data.userObj.username);
     // cookies.set("stream", stream);
   };
 

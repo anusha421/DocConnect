@@ -1,13 +1,24 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import bg from "../../assets/bg.jpg";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import logo from "../../assets/logo.svg";
 import Login from "./Login";
 import Signup from "./Signup";
+import Cookies from "universal-cookie";
 import { Card, Container } from "@mui/material";
+
+const cookies = new Cookies();
 
 function Authentication() {
   const [isLogin, setIsLogin] = useState(true);
+  const user = cookies.get("jwt");
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if(user) {
+      navigate("/posts");
+    }
+  }, [user, navigate])
 
   return (
     <Container

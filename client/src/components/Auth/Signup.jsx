@@ -38,7 +38,6 @@ function Signup({ setIsLogin }) {
 
   const submitHandler = async (e) => {
     e.preventDefault();
-    console.log(userData);
 
     if (
       userData.name == "" ||
@@ -65,6 +64,7 @@ function Signup({ setIsLogin }) {
 
     console.log(res);
     cookies.set("jwt", res.data.userObj.token);
+    cookies.set("username", res.data.userObj.username);
     // cookies.set("stream", stream);
   };
 

@@ -16,18 +16,6 @@ import {
 } from "@mui/material";
 import Navbar from "../Navbar";
 
-const VisuallyHiddenInput = styled("input")({
-  clip: "rect(0 0 0 0)",
-  clipPath: "inset(50%)",
-  height: 1,
-  overflow: "hidden",
-  position: "absolute",
-  bottom: 0,
-  left: 0,
-  whiteSpace: "nowrap",
-  width: 1,
-});
-
 const EditProfile = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -38,7 +26,7 @@ const EditProfile = () => {
     setOpen(false);
     navigate(-1);
   };
-  
+
   function submitHandler(e) {
     e.preventDefault();
   }
@@ -115,7 +103,6 @@ const EditProfile = () => {
                 id="username"
                 placeholder="Username"
                 name="username"
-                autoComplete="family-name"
                 sx={{
                   input: { color: "white" },
                   border: "1px solid#fff",
@@ -123,9 +110,25 @@ const EditProfile = () => {
               />
             </Grid>
             <Grid item xs={12}>
-            <Input
+              <TextField
+                required
+                fullWidth
+                id="bio"
+                placeholder="Bio"
+                name="bio"
                 sx={{
-                  display: "none",
+                  input: { color: "white" },
+                  border: "1px solid#fff",
+                }}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <Input
+                fullWidth
+                sx={{
+                  input: { color: "white" },
+                  border: "1px solid#fff",
+                  padding: "0.5rem"
                 }}
                 name="image"
                 type="file"
@@ -134,7 +137,7 @@ const EditProfile = () => {
                 id="image"
                 autoFocus
               />
-              <label htmlFor="image">
+              {/* <label htmlFor="image">
                 <Button
                   fullWidth
                   component="span"
@@ -146,7 +149,7 @@ const EditProfile = () => {
                 >
                   Upload Photo
                 </Button>
-              </label>
+              </label> */}
             </Grid>
           </Grid>
 

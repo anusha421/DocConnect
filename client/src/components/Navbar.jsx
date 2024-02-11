@@ -13,6 +13,7 @@ const cookies = new Cookies();
 function Navbar() {
   const navigate = useNavigate();
   const user = cookies.get("jwt");
+  const username = cookies.get("username");
 
   useEffect(() => {
     if (!user) {
@@ -47,7 +48,7 @@ function Navbar() {
             <AddIcon color="primary" />
           </IconButton>
         </Link>
-        <Link to="/profile">
+        <Link to={`/${username}`}>
           <IconButton aria-label="account-circle">
             <AccountCircle color="primary" />
           </IconButton>

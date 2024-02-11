@@ -16,11 +16,15 @@ import {
   DialogContentText,
   DialogTitle,
 } from "@mui/material";
+import Cookies from "universal-cookie";
 import axios from "axios";
+
+const cookies = new Cookies();
 
 function PostDetails({ data }) {
   const [open, setOpen] = React.useState(false);
   const [likes, setLikes] = useState(data.likes.length);
+  const username = cookies.get("username");
   const navigate = useNavigate();
   const deleteURL = `http://localhost:3000/posts/${data._id}/delete`;
   const likeURL = `http://localhost:3000/posts/${data._id}/likePost`;
@@ -50,7 +54,7 @@ function PostDetails({ data }) {
   }
 
   function handleLikeClick() {
-    axios.patch(likeURL).catch((error) => {
+    axios.patch(likeURL, { "username": username }).catch((error) => {
       console.log(error);
       return;
     });
@@ -77,17 +81,20 @@ function PostDetails({ data }) {
           </Link>
 
           <div>
-            {/* {loggedInUser == data.user && edit} */}
-            <Link
-              to={`../posts/edit/${data._id.$oid}`}
-              state={{ postData: data }}
-              style={{ paddingRight: "0.5rem" }}
-            >
-              <EditIcon color="primary" />
-            </Link>
-            <Link onClick={handleClickOpen}>
-              <DeleteIcon color="primary" />
-            </Link>
+            {username == data.user && (
+              <>
+                <Link
+                  to={`../posts/edit/${data._id.$oid}`}
+                  state={{ postData: data }}
+                  style={{ paddingRight: "0.5rem" }}
+                >
+                  <EditIcon color="primary" />
+                </Link>
+                <Link onClick={handleClickOpen}>
+                  <DeleteIcon color="primary" />
+                </Link>
+              </>
+            )}
             <Dialog
               open={open}
               onClose={handleClose}
