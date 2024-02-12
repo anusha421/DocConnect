@@ -27,10 +27,11 @@ const EditProfile = () => {
   const [open, setOpen] = useState(true);
   const [openDialog, setOpenDialog] = useState(false);
   const createUrl = "http://localhost:3000/posts/create";
+  const [selectedFile, setSelectedFile] = useState(null);
   const [data, setData] = useState({
     user: cookies.get("username"),
     content: "",
-    imageUrl: "",
+    image: "",
     likes: [],
   });
 
@@ -48,10 +49,14 @@ const EditProfile = () => {
     setData({ ...data, [name]: value });
   };
 
+  const handleFileChange = (event) => {
+    setSelectedFile(event.target.files[0]);
+  };
+
   const uploadImage = async () => {
     try {
       // Fetching the image as a Blob
-      const file = data.imageUrl;
+      const file = selectedFile;
       console.log(file)
       const formData = new FormData();
       formData.append("file", file);
@@ -66,7 +71,9 @@ const EditProfile = () => {
       );
 
       const img = await uploadResponse.json();
-      setData({ ...data, imageUrl: img.secure_url });
+      console.log(img);
+      setData({ ...data, image: img["secure_url"] });
+      console.log(data.image);
     } catch (error) {
       console.error("Error uploading image:", error);
     }
@@ -75,7 +82,7 @@ const EditProfile = () => {
   const submitHandler = async (e) => {
     e.preventDefault();
 
-    if (data.content == "" || data.imageUrl == "") {
+    if (data.content == "" || !selectedFile) {
       setOpenDialog(true);
       return;
     }
@@ -168,11 +175,10 @@ const EditProfile = () => {
                   border: "1px solid#fff",
                   padding: "0.5rem",
                 }}
-                name="imageUrl"
+                name="image"
                 id="image"
                 type="file"
-                value={data.imageUrl}
-                onChange={handleChange}
+                onChange={handleFileChange}
                 inputProps={{ accept: "image/*" }}
                 required
                 autoFocus
